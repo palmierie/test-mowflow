@@ -10,11 +10,25 @@ duration_per_location = [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
 data = {location_ids: location_ids, locations: locations, duration_per_location: duration_per_location}
 
 json = JSON.dump(data)
+# stdin, stdout, stderr = Open3.popen3("python ./ortools_d/examples/python/cvrptw_mowflow_wip.py")
 stdin, stdout, stderr = Open3.popen3("python ./ortools_d/examples/python/u_made_it.py")
 stdin.write(json)
 stdin.close()
-json = JSON.parse(stdout.read())
+pythondata = stdout.read()
+json = JSON.parse(pythondata, quirks_mode: true)
+# json = JSON.parse(pythondata)
 puts json
+
+
+# {
+#   "route": {
+#       "route_day": "1",
+#       "route": 
+#         [
+
+#         ]
+#   }
+# }
 
 # {
 # 	"id": "0001",

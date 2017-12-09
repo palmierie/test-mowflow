@@ -40,10 +40,16 @@ import math
 from six.moves import xrange
 from ortools.constraint_solver import pywrapcp
 from ortools.constraint_solver import routing_enums_pb2
+
 ## EDIT
 raw = sys.stdin.read()
 rubydata = json.loads(raw)
-main(rubydata)
+# python_data = main(rubydata)
+# python_data = main_test(rubydata)
+# print (json.dumps(main_test(rubydata)))
+# print (json.dumps(python_data))
+print (json.dumps("python_data works"))
+
 # rubydata["response"] = "Howdy from python"
 # x = rubydata["a"]
 # a = x + 4
@@ -121,6 +127,10 @@ def main(json_data):
   # locations = data[1]
   # duration_per_location = data[2]
 
+  # Send data Object
+  pythondata = {}
+  testobject = {}
+
   # num_locations = len(locations)
   num_locations = len(location_ids)
 
@@ -183,32 +193,64 @@ def main(json_data):
 
       for route_day_num in xrange(num_route_days):
         index = routing.Start(route_day_num)
-        plan_output = 'Route {0}:'.format(route_day_num+1)
+        # plan_output = 'Route {0}:'.format(route_day_num+1)
+        # pythondata["route_day"] = 'Route {0}:'.format(route_day_num+1)
+        route_day = 'route_day_{0}'.format(route_day_num+1)
+        pythondata[route_day] = {}
+        route_list = []
+        work_load_list = []
+        route_obj = {}
 
         while not routing.IsEnd(index):
           node_index = routing.IndexToNode(index)
           location_id = location_ids[node_index]
           work_var = capacity_dimension.CumulVar(index)
-          plan_output += \
-                    " {location_id} Work Load({workload}) -> ".format(
-                        location_id=location_id,
-                        workload=assignment.Value(work_var))
+          route_item = "{location_id}".format(location_id=location_id)
+          work_load_item = "{workload}".format(workload=assignment.Value(work_var))
+          route_list.append(route_item)
+          work_load_list.append(work_load_item)
           index = assignment.Value(routing.NextVar(index))
+          # plan_output += \
+          #           " {location_id} Work Load({workload}) -> ".format(
+          #               location_id=location_id,
+          #               workload=assignment.Value(work_var))
 
         node_index = routing.IndexToNode(index)
         location_id = location_ids[node_index]
         work_var = capacity_dimension.CumulVar(index)
-        plan_output += \
-                  " {location_id} Work Load({workload}) ".format(
-                      location_id=location_id,
-                      workload=assignment.Value(work_var))
-        print (plan_output)
+        route_item = "{location_id}".format(location_id=location_id)
+        work_load_item = "{workload}".format(workload=assignment.Value(work_var))
+        route_list.append(route_item)
+        work_load_list.append(work_load_item)
+
+        route_obj = {
+                      "location_ids": route_list,
+                      "work_load_added": work_load_list
+                    }
+        pythondata[route_day] = route_obj
+        # print (plan_output)
+      
+      # print (json.dumps(pythondata))
+      # print (json.dumps('pythondata'))
+      return pythondata
     else:
-      print ('No solution found.')
+      # print ('No solution found.')
+      pythondata["no_solution"] = "No solution found."
+      # print (json.dumps(pythondata))
+      return pythondata
   else:
-    print ('Specify an instance greater than 0.')
+    # print ('Specify an instance greater than 0.')
+    pythondata["no_data"] = "Specify an instance greater than 0."
+    # print (json.dumps(pythondata))
+    return pythondata
+    
+def main_test(json_data):
+  return "method works"
 
+# print (json.dumps("after"))
 
+# print (json.dumps(rubydata))
+# didn't work ^
 
 # def create_data_array(jsondata):
 

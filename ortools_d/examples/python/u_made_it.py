@@ -3,5 +3,19 @@ import json
 
 raw = sys.stdin.read()
 data = json.loads(raw)
-data["response"] = "U MADE IT SON!  PYTHON AWAY!"
-print (json.dumps(data))
+res_obj = {"response_object": "title",
+            "inner_array": [
+              "thing_1",
+              "thing_2",
+              "thing_3",
+              "thing_4"  
+            ]
+          }
+# answer = add(2,4)
+# def add(one, two):
+#   return one + two
+
+# data["response"] = "U MADE IT SON!  PYTHON AWAY!"
+# data["response"] = res_obj
+# data["response"] = answer
+print (json.dumps('data'))

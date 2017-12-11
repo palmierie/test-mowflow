@@ -41,21 +41,14 @@ from six.moves import xrange
 from ortools.constraint_solver import pywrapcp
 from ortools.constraint_solver import routing_enums_pb2
 
-## EDIT
-raw = sys.stdin.read()
-rubydata = json.loads(raw)
-# python_data = main(rubydata)
-# python_data = main_test(rubydata)
-# print (json.dumps(main_test(rubydata)))
-# print (json.dumps(python_data))
-print (json.dumps("python_data works"))
 
-# rubydata["response"] = "Howdy from python"
-# x = rubydata["a"]
-# a = x + 4
-# rubydata["a"] = a
-# print (json.dumps(rubydata))
-## EDIT ^
+def main_test(json_data):
+  testobj = {}
+  testobj["first_thang"] = json_data
+  # return json_data
+  return testobj
+  # return "method works"
+  # return {"method works", json_data}
 
 def distance(x1, y1, x2, y2):
     # Manhattan distance
@@ -64,7 +57,6 @@ def distance(x1, y1, x2, y2):
     return dist
 
 # Distance callback
-
 class CreateDistanceCallback(object):
   """Create callback to calculate distances and travel times between points."""
 
@@ -94,9 +86,6 @@ class CreateDistanceCallback(object):
   def Distance(self, from_node, to_node):
     return self.matrix[from_node][to_node]
 
-
-
-
 # Duration_Per_Location callback
 class CreateDurationPerLocationCallback(object):
   """Create callback to get duration_per_location at location node."""
@@ -107,13 +96,6 @@ class CreateDurationPerLocationCallback(object):
   def Duration_per_location(self, from_node, to_node):
     return self.matrix[from_node]
 
-
-
-# Service time (proportional to Duration_Per_Location) callback.
-# DELETED
-
-# Create total_time callback (equals service time plus travel time).
-# DELETED
 
 def main(json_data):
   #Get the data
@@ -129,7 +111,6 @@ def main(json_data):
 
   # Send data Object
   pythondata = {}
-  testobject = {}
 
   # num_locations = len(locations)
   num_locations = len(location_ids)
@@ -161,14 +142,15 @@ def main(json_data):
 
     dist_between_locations = CreateDistanceCallback(locations)
     dist_callback = dist_between_locations.Distance
-
     routing.SetArcCostEvaluatorOfAllVehicles(dist_callback)
+
     durations_at_locations = CreateDurationPerLocationCallback(duration_per_location)
     duration_per_location_callback = durations_at_locations.Duration_per_location
 
     # Adding capacity dimension constraints. Divides total Work available by the number of route days
     WorkCapacity = math.ceil(sum(duration_per_location)/float(num_route_days))+10;
-    print ("Work Capacity Divided Evenly Per Day", WorkCapacity)
+    pythondata['work_cap_per_day'] = WorkCapacity
+    # print ("Work Capacity Divided Evenly Per Day", WorkCapacity)
     NullCapacitySlack = 0;
     fix_start_cumul_to_zero = True
     capacity = "Capacity"
@@ -180,14 +162,19 @@ def main(json_data):
     # Solve displays a solution if any.
     assignment = routing.SolveWithParameters(search_parameters)
     if assignment:
-      data = create_data_array()
-      location_ids = data[0]
-      locations = data[1]
-      duration_per_location = data[2]
+      # data = create_data_array()
+      # location_ids = data[0]
+      # locations = data[1]
+      # duration_per_location = data[2]
+      #Get the data
+      location_ids = json_data["location_ids"]
+      locations = json_data["locations"]
+      duration_per_location = json_data["duration_per_location"]
       # size = len(locations)
       # DELETED ^
       # Solution cost.
-      print ("Total distance of all routes: " , str(assignment.ObjectiveValue()))
+      pythondata['total_distance_all_routes'] = str(assignment.ObjectiveValue()) 
+      # print ("Total distance of all routes: " , str(assignment.ObjectiveValue()))
       # Inspect solution.
       capacity_dimension = routing.GetDimensionOrDie(capacity);
 
@@ -229,28 +216,20 @@ def main(json_data):
                     }
         pythondata[route_day] = route_obj
         # print (plan_output)
-      
-      # print (json.dumps(pythondata))
-      # print (json.dumps('pythondata'))
-      return pythondata
     else:
       # print ('No solution found.')
       pythondata["no_solution"] = "No solution found."
-      # print (json.dumps(pythondata))
-      return pythondata
   else:
     # print ('Specify an instance greater than 0.')
     pythondata["no_data"] = "Specify an instance greater than 0."
-    # print (json.dumps(pythondata))
-    return pythondata
+  return pythondata
     
-def main_test(json_data):
-  return "method works"
 
-# print (json.dumps("after"))
-
-# print (json.dumps(rubydata))
-# didn't work ^
+# Gets data from Ruby - Sends Data back to Ruby
+raw = sys.stdin.read()
+rubydata = json.loads(raw)
+python_data = main(rubydata)
+print (json.dumps(python_data))
 
 # def create_data_array(jsondata):
 

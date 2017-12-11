@@ -11,11 +11,19 @@ res_obj = {"response_object": "title",
               "thing_4"  
             ]
           }
-# answer = add(2,4)
-# def add(one, two):
-#   return one + two
 
+def sub(one, two):
+  return one - two
+
+def add(one, two):
+  return one + two
+
+subanswer = sub(2,4)
+
+answer = add(2,4)
 # data["response"] = "U MADE IT SON!  PYTHON AWAY!"
 # data["response"] = res_obj
 # data["response"] = answer
-print (json.dumps('data'))
+
+# print (json.dumps('data'))
+print (json.dumps(answer))
